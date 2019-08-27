@@ -21,8 +21,10 @@ class HomePage extends StatelessWidget {
       ),
       body: Container(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             _swipperTarjetas(),
+            _footer(context),
           ],
         ),
       ),
@@ -44,6 +46,35 @@ class HomePage extends StatelessWidget {
           );
         }
       },
+    );
+  }
+
+  Widget _footer(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Populares',
+            style: Theme.of(context).textTheme.subhead,
+          ),
+          FutureBuilder(
+            future: peliculasProvider.getPopulares(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                return CardSwiper(peliculas: snapshot.data);
+              } else {
+                return Container(
+                  height: 100.0,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 import 'package:http/http.dart' as http;
 
 import 'package:movies/models/pelicula_model.dart';
@@ -8,6 +9,15 @@ class PeliculasProvider {
   String _url = 'api.themoviedb.org';
   String _language = 'es-ES';
 
+  Future<List<Pelicula>> _procesarRespuesta(Uri url) async {
+    final resp = await http.get(url);
+    final decodedData = json.decode(resp.body);
+
+    final peliculas = new Peliculas.fromJsonList(decodedData['results']);
+
+    return peliculas.items;
+  }
+
   Future<List<Pelicula>> getEnCines() async {
     //creando la URL
     final url = Uri.https(_url, '3/movie/now_playing', {
@@ -15,11 +25,16 @@ class PeliculasProvider {
       'language': _language,
     });
 
-    final resp = await http.get(url);
-    final decodedData = json.decode(resp.body);
+    return await _procesarRespuesta(url);
+  }
 
-    final peliculas = new Peliculas.fromJsonList(decodedData['results']);
+  Future<List<Pelicula>> getPopulares() async {
+    //creando la URL
+    final url = Uri.https(_url, '3/movie/popular', {
+      'api_key': _apikey,
+      'language': _language,
+    });
 
-    return peliculas.items;
+    return await _procesarRespuesta(url);
   }
 }
